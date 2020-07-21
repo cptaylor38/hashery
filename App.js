@@ -1,8 +1,9 @@
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import SearchScreen from './src/screens/SearchScreen';
 import DetailsScreen from './src/screens/DetailsScreen';
+import { createStackNavigator } from 'react-navigation-stack';
 
-const navigator = createSwitchNavigator(
+const navigator = createStackNavigator(
   {
     Search: SearchScreen,
     Details: DetailsScreen,
@@ -11,6 +12,10 @@ const navigator = createSwitchNavigator(
     initialRouteName: 'Search',
     defaultNavigationOptions: {
       title: 'Hashery',
+      headerTitleStyle: {
+        alignSelf: 'center',
+        fontSize: 22,
+      },
     },
   }
 );

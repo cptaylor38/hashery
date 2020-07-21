@@ -1,29 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import SearchBar from '../components/SearchBar';
-import yelp from '../api/yelp';
+import useResults from '../hooks/useResults';
+import ResultsList from '../components/ResultsList';
 
 const SearchScreen = () => {
   const [query, setQuery] = useState('');
-  const [searchResults, setResults] = useState([]);
-  const [errorMsg, setError] = useState('');
+  const [searchQuery, searchResults, errorMsg] = useResults();
 
-  const searchQuery = async () => {
-    try {
-      const response = await yelp.get('/search', {
-        params: {
-          limit: 50,
-          term: query,
-          location: 'lexington',
-        },
-      });
-      setError('');
-      setResults(response.data.businesses);
-      console.log(searchResults);
-    } catch (error) {
-      console.log(error);
-      setError('Something went wrong, please try again later.');
-    }
+  const filterResultsByPrice = (price) => {
+    return searchResults.filter((result) => result.price === price);
   };
 
   return (
@@ -31,9 +17,19 @@ const SearchScreen = () => {
       <SearchBar
         query={query}
         defineQuery={setQuery}
-        onQuerySubmit={searchQuery}
+        onQuerySubmit={() => searchQuery(query)}
       />
-      <Text>We have found {searchResults.length} results.</Text>
+      <ScrollView style={{ marginLeft: 15 }}>
+        <ResultsList
+          results={filterResultsByPrice('$')}
+          title='Cost Effective'
+        />
+        <ResultsList results={filterResultsByPrice('$$')} title='Bit Pricier' />
+        <ResultsList
+          results={filterResultsByPrice('$$$')}
+          title='Big Spender'
+        />
+      </ScrollView>
       {errorMsg !== '' ? <Text>{errorMsg}</Text> : null}
     </View>
   );
@@ -41,7 +37,8 @@ const SearchScreen = () => {
 
 const styles = StyleSheet.create({
   searchScreen: {
-    marginTop: 30,
+    backgroundColor: 'white',
+    flex: 1,
   },
 });
 
